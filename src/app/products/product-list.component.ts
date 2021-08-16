@@ -18,16 +18,8 @@ export class ProductListComponent {
   private categorySelectedSubject = new BehaviorSubject<number>(0);
   categorySelectedAction$ = this.categorySelectedSubject.asObservable();
 
-
-  // products$ = this.productService.productsWithCategory$
-  //   .pipe(
-  //     catchError(err=> {
-  //       this.errorMessage = err;
-  //       return EMPTY;
-  //     })      
-  //   );
   products$ = combineLatest([
-    this.productService.productsWithCategory$,
+    this.productService.productsWithAdd$,
     this.categorySelectedAction$.pipe(
       startWith(0)
     )
@@ -56,7 +48,7 @@ export class ProductListComponent {
   }
 
   onAdd(): void {
-    console.log('Not yet implemented');
+    this.productService.addProduct();
   }
 
   onSelected(categoryId: string): void {

@@ -1,11 +1,6 @@
-<div class="card"
-     *ngIf="product">
-  <div class="card-header">
-    {{pageTitle}}
-  </div>
-
+<div class="card" *ngIf="product$ | async as product">
+  <div class="card-header">{{pageTitle}}</div>
   <div class="card-body">
-
     <div class="row">
       <div class="col-md-2">Name:</div>
       <div class="col-md-6">{{product.productName}}</div>
@@ -30,10 +25,8 @@
       <div class="col-md-2">In Stock:</div>
       <div class="col-md-6">{{product.quantityInStock}}</div>
     </div>
-
     <div class="table-responsive">
-      <table class="table mb-0"
-             *ngIf="productSuppliers">
+      <table class="table mb-0" *ngIf="productSuppliers">
         <thead>
           <tr>
             <th>Supplier</th>
@@ -50,11 +43,6 @@
         </tbody>
       </table>
     </div>
-
   </div>
 </div>
-
-<div class="alert alert-danger"
-     *ngIf="errorMessage">
-  {{errorMessage}}
-</div>
+<div class="alert alert-danger"*ngIf="errorMessage">{{errorMessage}}</div>
