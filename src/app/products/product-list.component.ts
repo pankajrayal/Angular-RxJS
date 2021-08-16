@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { EMPTY, Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, EMPTY, Observable, of, Subject } from 'rxjs';
+import { map, catchError, startWith } from 'rxjs/operators';
+import { ProductCategoryService } from '../product-categories/product-category.service';
 
 import { Product } from './product';
 import { ProductService } from './product.service';
@@ -14,16 +15,42 @@ export class ProductListComponent {
   pageTitle = 'Product List';
   errorMessage = '';
   categories;
+  private categorySelectedSubject = new BehaviorSubject<number>(0);
+  categorySelectedAction$ = this.categorySelectedSubject.asObservable();
 
-  products$ = this.productService.productsWithCategory$
+
+  // products$ = this.productService.productsWithCategory$
+  //   .pipe(
+  //     catchError(err=> {
+  //       this.errorMessage = err;
+  //       return EMPTY;
+  //     })      
+  //   );
+  products$ = combineLatest([
+    this.productService.productsWithCategory$,
+    this.categorySelectedAction$.pipe(
+      startWith(0)
+    )
+  ]) 
     .pipe(
+      map(([products, selectedCategoryId])=> 
+        products.filter(product => 
+          selectedCategoryId ? product.categoryId === selectedCategoryId : true
+    )),
       catchError(err=> {
         this.errorMessage = err;
         return EMPTY;
       })      
     );
+  categories$ = this.categoryService.productCategories$
+      .pipe(
+        catchError(err=> {
+          this.errorMessage = err;
+          return EMPTY;
+        })
+      );
 
-  constructor(private productService: ProductService) { }
+  constructor(private productService: ProductService, private categoryService: ProductCategoryService) { }
 
   ngOnInit(): void {
   }
@@ -33,6 +60,6 @@ export class ProductListComponent {
   }
 
   onSelected(categoryId: string): void {
-    console.log('Not yet implemented');
+    this.categorySelectedSubject.next(+categoryId);
   }
 }
